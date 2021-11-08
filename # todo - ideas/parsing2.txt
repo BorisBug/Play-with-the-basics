@@ -1,0 +1,53 @@
+Parser of a simple equation
+
+Exercise - 1
+---------------------
+
+Format: "#@#"
+# = positive FLOAT number (unless that you want to play even more with negatives)
+# = any amount of digits
+@ = {+, -, /, *}
+Optional spaces:
+-> Format: " # @ # "
+-> You decide if they are valid or not (easier if not valid)
+
+Output:
+- print format valid/not valid
+- print result of equation
+- you decide how many zeros are printed after a comma/point.
+
+Input examples:
+"33+44"
+"12-333"
+"70/5"
+"90*2"
+"32.5-33"
+...if you are playing with negatives:
+"-20-10"
+
+Pay attention to:
+"10 +20"
+" 10+20"
+"30.5-.5"
+"1.2.3+4"
+"50/0"
+...if you are playing with negatives:
+"-20-10"
+"20--10"
+
+
+Exercise - 2
+---------------------
+
+Format: "FUN(#,#)"
+..where FUN could be "ADD, SUB, MUL, DIV"
+
+Input examples:
+"ADD(33,44)"
+"SUB(12-333)"
+"DIV(70/5)"
+"MUL(90,2)"
+
+Pay attention to:
+"SUB(32.5,33)"
+"ADD(10 ,20)"

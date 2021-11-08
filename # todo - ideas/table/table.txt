@@ -1,0 +1,44 @@
+Table
+----------------------------------
+
+Make a program following the specifications.
+
+Rules:  
+a- Print only: ' ', '\n', then numbers "%d" and chars "%c" using variables.
+b- Use max 2 loops in each function.
+
+Goal:
+- Understanding of patterns.
+- Understanding of boundaries.
+- Understanding of % operator.
+- Thinking the best "if" (or "ifs").
+- Understanding of differences and similitudes of chars and numbers.
+- Use of ctype library.
+
+1. Make a program that prints this out:
+
+0 3 6
+1 4 7
+2 5 8
+
+2. Expand exercise 1 to print a table with 4 columns and 32 rows
+
+..0 .32 .64 .96
+..1 .33 .65 .97
+..2 .34 .66 .98
+... ... ... ...
+... ... ... ...
+.30 .62 .94 126
+.31 .63 .95 127
+
+3. Print the ASCII table (0-127)
+
+..0: ?  .32:    .64: @  .96: `
+..1: ?  .33: !  .65: A  .97: a
+..2: ?  .34: "  .66: B  .98: b
+..3: ?  .35: #  .67: C  .99: c
+..4: ?  .36: $  .68: D  100: d
+..5: ?  .37: %  .69: E  101: e
+... ..  ... ..  ... ..  ... ..
+
+

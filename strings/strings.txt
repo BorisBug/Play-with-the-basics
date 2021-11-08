@@ -1,0 +1,87 @@
+Strings
+----------------------------------
+
+sSSs  TTTTt  RRRr   Ii  N   N  gGGGg  sSSs
+S       T    R  R   Ii  Nn  N  G      S
+sSSs    T    RRRr   II  N N N  G  gG  sSSs
+   S    T    R  R   II  N  NN  G   G     S
+SssS    tt   R   R  II  N   N  GgggG  SssS
+
+Make a function that accomplish the specific request.
+
+Rules:  
+a- Include stdio.h and ctype.h, nothing else.
+b- Use 1 or max 2 loops in each function.
+c- It is possible to use the functions created previously.
+Test:
+a- For the functions that transform the input string, make the test using printf before and after the call of the function.
+b- For the functions that return a value just print the value. 
+
+Goal:
+- Understanding of 'char*' and 'const char*'.
+- Understanding of similitudes between 'char array[]' and 'char *'.
+- Understanding of similitudes between chars and numbers.
+- Understanding of % operator.
+- Familiarize with boundaries inide of a string.
+- Use of ctype library.
+
+------->
+
+int count_chars(const char *str)
+Make a function that returns the count of all characters from a string until null is found.
+
+int find_first_char(const char *str, char find)
+Make a function that returns the index of the first found character from a string. If null is reached without hitting 'find' the return is -1.
+
+int find_last_char(const char *str, char find)
+Make a function that returns the index of the first found character from a string but starting from the end. If 'find' doesn't hit the return is -1.
+
+void change_char(char *str, char from, char to)
+Make a function that changes the content of a string in a way that every char that is equal to 'from' turns into 'to'.
+
+unsigned string_copy(char *dest, const char *source)
+Make a function that copies the content of a string 'source' into 'dest' and returns the amount of characters copied.
+
+void only_alpha(char *str)
+Make a function that changes the content of a string keeping only alphabet characters, and filtering everything else.
+
+void only_numbers(char *str)
+Make a function that changes the content of a string keeping only numeric characters, and filtering everything else ('.' and ',' also filtered).
+
+void reverse_string(char *str)
+Make a function that reverses the content of a string.
+
+void shift_left(char *str)
+Make a function that shifts the content of a string one character to the left. The original first char should be the last.
+
+void shift_left_n(char *str, unsigned amount)
+Make a function that shifts the content of a string 'amount' character to the left. The original 'amount' chars on the left should be the lasts.
+
+void string_trim_left(char *str)
+Make a function that changes the content of a string removing all leading spaces from left.
+
+void string_trim_right(char *str)
+Make a function that changes the content of a string removing all ending spaces from right.
+
+void string_trim(char *str)
+Make a function that changes the content of a string removing all leading and ending spaces. 
+
+void string_trim_all(char *str)
+Make a function that changes the content of a string removing all leading and ending spaces and keeping max one space in between different words.
+
+void capitalize(char *str)
+Make a function that capitalises and completely trims a string.
+
+unsigned int string_to_uint(const char *str)
+Make a function that receives an unsigned number in string format and returns the value as unsigned int. The conversion stops when null is found or when a non numerical character is found.
+
+int string_to_int(const char *str)
+Make a function that receives a signed number in string format and returns the value as int. The conversion stops when null is found or when a non numerical character is found (with the exception of '-' and '+').
+
+double string_to_double(const char *str)
+Make a function that receives a number in string format and returns the value as double. The conversion stops when null is found or when a non numerical character is found (with the exception of '-','+','.' and ',')
+
+------->
+Boris Snäll
+borissnaell@gmail.com
+------->------->------->
