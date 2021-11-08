@@ -1,0 +1,15 @@
+## Exclude special folders
+Assignments
+Other files
+
+## Exclude
+*.json
+*.vscode
+out
+
+###
+!*.c
+!*.h
+!*.sh
+!*.pdf
+!*.txt
