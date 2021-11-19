@@ -6,10 +6,9 @@
 #include <stdarg.h>
 #include <time.h>
 #include <ncurses.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 void clearscr();
-void delay(int milli);
 
 void xy_goto(int x, int y);
 void xy_attr_set(int x, int y, int flag);
@@ -19,6 +18,5 @@ void xy_print_num(int x, int y, int num);
 void xy_print_fmt(int x, int y, const char *fmt, ...);
 void xy_line_x(int px, int py, int sizeX, char c);
 void xy_line_y(int px, int py, int sizeY, char c);
-void xy_cross(int px, int py, int size, int offX, int offY);
 
 #endif

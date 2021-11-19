@@ -1,9 +1,5 @@
 #include "xy-print.h"
 
-#define MAX(a,b)    ((a)>(b)?(a):(b))
-#define FITIN(a,size) (((a)<0?(a)+(size):(a))%(size)) // to use with offsets
-
-
 #define USE_NCURSES 1
 
 void clearscr()
@@ -16,6 +12,8 @@ void clearscr()
     #endif
 }
 
+/*
+// use napms(int milli)
 void delay(int milli)
 {
     if (milli <= 0)
@@ -26,11 +24,12 @@ void delay(int milli)
     do { now = clock() * 1000 / CLOCKS_PER_SEC;
     } while (now <= end);
 }
+*/
 
 void xy_goto(int x, int y)
 {
     #if USE_NCURSES
-    move(y+1,x+1);
+    move(y,x);
     #else
     printf("%c[%d;%df", 0x1B, y+1, x+1);
     #endif
@@ -39,16 +38,20 @@ void xy_goto(int x, int y)
 void xy_attr_set(int x, int y, int flag)
 {
     #if USE_NCURSES
-    move(y+1,x+1);
+    move(y,x);
     attrset(flag);
     #endif
 }
 
 void xy_print_c(int x, int y, char c)
 {
+    if(x<0 || y<0)
+        return;
+        
     #if USE_NCURSES
     char str[]={c,0};
-    mvaddstr(y+1,x+1,str);
+    mvaddstr(y,x,str);
+//  mvaddch(y,x,(int)c);
     #else
     printf("%c[%d;%df%c", 0x1B, y+1, x+1, c);
     #endif
@@ -57,7 +60,7 @@ void xy_print_c(int x, int y, char c)
 void xy_print_str(int x, int y, char *str)
 {
     #if USE_NCURSES
-    mvaddstr(y+1,x+1,str);
+    mvaddstr(y,x,str);
     #else
     printf("%c[%d;%df%s", 0x1B, y+1, x+1, str);
     #endif
@@ -75,7 +78,7 @@ void xy_print_fmt(int x, int y, const char *fmt, ...)
     char buffer[100];
     vsprintf(buffer, fmt, arg);
     #if USE_NCURSES
-    mvprintw(y+1,x+1,"%s", buffer);
+    mvprintw(y,x,"%s", buffer);
     #else
     printf("%c[%d;%df%s", 0x1B, y+1, x+1, buffer);
     #endif
@@ -85,7 +88,7 @@ void xy_print_fmt(int x, int y, const char *fmt, ...)
 void xy_line_y(int px, int py, int sizeY, char c)
 {
     #if USE_NCURSES
-    mvvline(py+1,px+1,c,sizeY);
+    mvvline(py,px,c,sizeY);
     #else
     while(sizeY-->0)
         xy_print_c(px,py++,c);
@@ -95,33 +98,9 @@ void xy_line_y(int px, int py, int sizeY, char c)
 void xy_line_x(int px, int py, int sizeX, char c)
 {
     #if USE_NCURSES
-    mvhline(py+1,px+1,c,sizeX);
+    mvhline(py,px,c,sizeX);
     #else
     while(sizeX-->0)
         xy_print_c(px++,py,c);
-    #endif
-}
-
-void xy_cross(int px, int py, int size, int offX, int offY)
-{
-    char line[200]={0};
-    offX %= size;
-    offY %= size;
-
-    for(int y=-offY; y<size-offY; y++)
-    {
-        for(int x=-offX; x<size-offX; x++)
-        {
-            bool is_leg1 = FITIN(x,size)==FITIN(y,size);
-            bool is_leg2 = FITIN(x,size)==size-FITIN(y,size)-1;
-            bool is_x = is_leg1 || is_leg2;
-            line[x+offX] = is_x ? 'x' : '.';
-        }
-        
-        xy_print_str(px, py+y+offY, line);
-    }
-    
-    #if USE_NCURSES==0
-    printf("\n");
     #endif
 }

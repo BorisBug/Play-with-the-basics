@@ -7,6 +7,28 @@
  */
 #include "xy-print.h"
 
+#define FITIN(a,size) (((a)<0?(a)+(size):(a))%(size)) // to use with offsets
+
+void xy_cross(int px, int py, int size, int offX, int offY)
+{
+    char line[200]={0};
+    offX %= size;
+    offY %= size;
+
+    for(int y=-offY; y<size-offY; y++)
+    {
+        for(int x=-offX; x<size-offX; x++)
+        {
+            bool is_leg1 = FITIN(x,size)==FITIN(y,size);
+            bool is_leg2 = FITIN(x,size)==size-FITIN(y,size)-1;
+            bool is_x = is_leg1 || is_leg2;
+            line[x+offX] = is_x ? 'x' : '.';
+        }
+        
+        xy_print_str(px, py+y+offY, line);
+    }
+}
+
 void xy_label_cross(int px, int py, int size, int offX, int offY)
 {
     xy_print_fmt(px, py, "cross(%d,%d,%d,%d,%d)   ", px, py, size, offX, offY);
@@ -38,9 +60,9 @@ int play_with_xy_cross(int i, int pause)
     xy_line_y(36+i+7, 7, 8, ' '); // clean post
 
     xy_print_fmt(0,15, "Press any key to exit..");
-    delay(pause); // 10 frames per sec
-    refresh();
-    return getch()!=-1;
+    napms(pause); // 10 frames per sec
+    wrefresh(stdscr);
+    return wgetch(stdscr)!=-1;
 }
 
 int main()
@@ -48,7 +70,7 @@ int main()
     initscr();      // initialize ncurses
     noecho();       // no echo on getch
     curs_set(0);    // cursor hidden
-    timeout(0);     // no wait for key to be pressed
+    nodelay(stdscr, TRUE); // no wait for key to be pressed
 
     int i=0, j=0, pause=80;
     int exit=0, inc=-15;

@@ -48,7 +48,7 @@
 void print_bin(uint32_t x, int spaces, int start, int amount, bool value)
 {
     assert(start>=0 && start<=31); // index
-    assert(amount>=1 && start<=32); // amount
+    assert(amount>=1 && amount<=32); // amount
 
     while(spaces-->0)
         printf(".");

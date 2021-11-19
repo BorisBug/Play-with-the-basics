@@ -3,7 +3,7 @@
  * @author Boris Snäll (borissnaell@gmail.com)
  * @brief Demonstration of coding
  *          - Use of arrays (and its [] operator)
- *          - Use of structs (struct keyword)
+ *          - Use of structs
  *          - Use of pointers to structs (-> operator)
  *          - Use of array of structs
  *          - Use of mod in equations (% operator)
@@ -32,25 +32,29 @@ typedef struct
 const char star_state[] =
 "................. .........................."\
 "........................... ................"\
-"........... ...................:............"\
+"........... ................................"\
 "........................ ............*......"\
-"..........................:................."\
+"............................................"\
 "......+....................................."\
-"......................:...... .........:..x."\
-"*.. @           .                           ";
+"............................. ............x."\
+"*.....          .                           ";
 #define STAR_SIZE sizeof(star_state)
 #define DIST(n1,n2) abs((n2)-(n1))
 
 // place the star in the sky
-void star_print(star_t *star)
+void night_star_print(star_t *star)
 {
     assert(star);
     assert(star->state<STAR_SIZE);
+
+    int col = (star->state%95!=0) ? (star->state%70!=0 ? 1 : 2) : 3;
+    attron(COLOR_PAIR(col));
     xy_print_c(star->x, star->y, star_state[star->state]);
+    attroff(COLOR_PAIR(col));
 }
 
 // remove the star from the sky
-void star_clear(star_t *star)
+void night_star_clear(star_t *star)
 {
     assert(star);
     xy_print_c(star->x, star->y, ' ');
@@ -97,7 +101,7 @@ void night_star_inc(starry_night_t *night, star_t *star)
     // start of a new cycle?
     if(star->state==0)
     {
-        star_clear(star);               // clear
+        night_star_clear(star);         // clear
         night_star_init(night, star);   // relocate
     }
 }
@@ -153,10 +157,10 @@ void night_run(starry_night_t *night)
     assert(night);
 
     // print frame
-    xy_print_c(night->x, night->y,'@');
-    xy_print_c(night->x+night->sx-1, night->y, '@');
-    xy_print_c(night->x, night->y+night->sy-1,'@');
-    xy_print_c(night->x+night->sx-1, night->y+night->sy-1, '@');
+    // xy_print_c(night->x, night->y,'@');
+    // xy_print_c(night->x+night->sx-1, night->y, '@');
+    // xy_print_c(night->x, night->y+night->sy-1,'@');
+    // xy_print_c(night->x+night->sx-1, night->y+night->sy-1, '@');
 
     // increment fade in counter
     night->fadein++;
@@ -164,7 +168,7 @@ void night_run(starry_night_t *night)
     // print starts and increment state
     for(int i=0; i<night->size && i<night->fadein/7; i++)
     {
-        star_print(&night->star[i]);
+        night_star_print(&night->star[i]);
         night_star_inc(night, &night->star[i]);
     }
 }
@@ -178,18 +182,28 @@ int main()
         exit(1);
 
     initscr();      // initialize ncurses
+    start_color();  // start the color handling
     noecho();       // no echo on getch
     curs_set(0);    // cursor hidden
-    timeout(0);     // no wait for key to be pressed
+    nodelay(stdscr, TRUE); // no wait for key to be pressed
 
+    init_pair(1, COLOR_WHITE, COLOR_BLACK);
+    init_pair(2, COLOR_RED, COLOR_BLACK);
+    init_pair(3, COLOR_CYAN, COLOR_BLACK);
+
+    int x = getbegx(stdscr);
+    int y = getbegy(stdscr);
+    int sx = getmaxx(stdscr);
+    int sy = getmaxy(stdscr);
+    
     srand(time(NULL));  // seed for randomizer
-    night_init(night,60,0,0,60,15); // initialize the "starry night" variables
+    night_init(night,30, x, y, sx, sy); // initialize the "starry night" variables
 
     do {
         night_run(night);   // run
-        xy_print_fmt(0,17,"Press any key to exit..");
-        refresh();          // refresh screen
-        delay(150);         // make a pause (0.15s)
+        xy_print_fmt(x, sy-1,"Press any key to exit..");
+        wrefresh(stdscr);   // refresh screen
+        napms(150);         // make a pause (0.15s)
     } while(getch()==-1);   // finish if a key is pressed
 
     night_destroy(&night);  // free memory
