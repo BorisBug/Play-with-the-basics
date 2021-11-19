@@ -17,7 +17,8 @@
 #include "xy-print.h"
 
 const char tail_chars[] = "0x::'";
-#define TAIL_SIZE sizeof(tail_chars)
+#define TAIL_SIZE (sizeof(tail_chars)-1)
+#define STATE_RECYCLE (-1)
 
 typedef struct pos
 {   int x;  // x axis position
@@ -168,55 +169,64 @@ void fireworks_rocket_print_explosion(rocket_t *rocket)
     case 9:
         fireworks_rocket_print_explosion_block(rocket, 4, ' ');
         break;
+    default:
+        rocket->state = STATE_RECYCLE;
+        break;
     }
 }
 
-// initialize a rocket
-void fireworks_rocket_init(fireworks_t *fw, rocket_t *rocket)
+// calculate a starting point, keeping distance to the other rockets
+void fireworks_rocket_calc_distance(fireworks_t *fireworks, rocket_t *rocket)
 {
-    assert(fw && rocket);
-    int x, y, try = 15;
-    float vx = (rand()%4)*50.0/100.0;
+    assert(fireworks && rocket);
+
+    int try = 15;
     bool repeat = false;
-
-    rocket->state = 0;
-    rocket->boom = fw->y + fw->sy/2 - rand()%(fw->sy/2) - 1;
-    rocket->vx = rand()%2 ? vx : -vx;
-    rocket->vy = -(float)(rand()%4+6)/10.0;
-
-    // set tail not visible
-    for(int i=0; i<TAIL_SIZE; i++)
-        rocket->tail[i].x = rocket->tail[i].y = -1;
-
-    // set a random position that keeps a minimum distance to another rocket
 
     do
     {   repeat = false;
-        x = fw->x + rand()%fw->sx;
-        y = fw->y + fw->sy - 1;
+        rocket->x = fireworks->x + rand()%fireworks->sx;
+        rocket->y = fireworks->y + fireworks->sy - 1;
 
         int minX = 4; // minimum distance
         int minY = 2; // minimum distance
 
-        for(rocket_t *r=fw->rocket; r; r=r->next)
-        if(r != rocket && r->x>=0 && r->y>=0)
-        if(DIST(x, r->x) < minX && DIST(y, r->y) < minY)
+        for(rocket_t *other=fireworks->rocket; other; other=other->next)
+        if(other!=rocket && other->x>=0 && other->y>=0)
+        if(DIST(rocket->x, other->x)<minX && DIST(rocket->y, other->y)<minY)
         {
             repeat = true;
             break;
         }
     } while(repeat && try-->0);
 
-    rocket->x = x;
-    rocket->y = y;
-    rocket->tail[0].x = x;
-    rocket->tail[0].y = y;
+    rocket->tail[0].x = rocket->x;
+    rocket->tail[0].y = rocket->y;
+}
+
+// initialize a rocket
+void fireworks_rocket_init(fireworks_t *fireworks, rocket_t *rocket)
+{
+    assert(fireworks && rocket);
+
+    rocket->state = 0;
+    rocket->boom = fireworks->y + fireworks->sy/2 - rand()%(fireworks->sy/2) - 1; // explode on the first half of the screen
+    rocket->vx = (float)(rand()%5)/4.0; // 0 - 0.25 - 0.5 - 0.75 - 1 //(rand()%4)*50.0/100.0; // 0-1.5
+    rocket->vx = rand()%2 ? rocket->vx : -rocket->vx;
+    rocket->vy = -(float)(rand()%4+6)/10.0; // 0.6 - 0.7 - 0.8 - 0.9
+
+    // set tail not visible
+    for(int i=0; i<TAIL_SIZE; i++)
+        rocket->tail[i].x = rocket->tail[i].y = -1;
+
+    // set a random position that keeps a minimum distance to another rocket
+    fireworks_rocket_calc_distance(fireworks, rocket);
 }
 
 // increment the state of a rocket
-void fireworks_rocket_inc(fireworks_t *fw, rocket_t *rocket)
+void fireworks_rocket_inc(rocket_t *rocket)
 {
-    assert(fw && rocket);
+    assert(rocket);
 
     // flying
     if(rocket->state==0)
@@ -224,12 +234,18 @@ void fireworks_rocket_inc(fireworks_t *fw, rocket_t *rocket)
         rocket->x += rocket->vx;
         rocket->y += rocket->vy;
 
-        if((int)rocket->x != rocket->tail[0].x || (int)rocket->y != rocket->tail[0].y)
+        // update position
+        if((int)rocket->x != rocket->tail[0].x ||
+           (int)rocket->y != rocket->tail[0].y)
         {
             fireworks_rocket_clear_tail(rocket); 
             fireworks_rocket_shift_tail(rocket);
             fireworks_rocket_print_tail(rocket);
         }
+    
+        // hit the explosion altitud
+        if((int)rocket->y<=rocket->boom)
+            rocket->state = 1;
     }
     else // about to explode
     if(rocket->state>0 && rocket->state<TAIL_SIZE)
@@ -244,51 +260,47 @@ void fireworks_rocket_inc(fireworks_t *fw, rocket_t *rocket)
         rocket->state++;
         fireworks_rocket_print_explosion(rocket);
     }
-
-    // hit the explosion altitud
-    if(rocket->state==0 && (int)rocket->y==rocket->boom)
-        rocket->state = 1;
 }
 
 /**
  * @brief Initialize the variables for the "fireworks structure"
- * @param fw the fireworks sky window
+ * @param fireworks the fireworks sky window
  * @param x position x on screen
  * @param y position y on screen
  * @param sx size x of window
  * @param sy size y of window
  */
-void fireworks_init(fireworks_t *fw, int x, int y, int sx, int sy)
+void fireworks_init(fireworks_t *fireworks, int x, int y, int sx, int sy)
 {
-    assert(fw);
+    assert(fireworks);
     assert(sx>0 && sy>0);
 
-    fw->x = x;
-    fw->y = y;
-    fw->sx = sx;
-    fw->sy = sy;
-    fw->count = 0;
-    fw->rocket = NULL;
+    fireworks->x = x;
+    fireworks->y = y;
+    fireworks->sx = sx;
+    fireworks->sy = sy;
+    fireworks->count = 0;
+    fireworks->rocket = NULL;
 }
 
 // remove rocket from the list
-void fireworks_rocket_del(fireworks_t *fw, rocket_t *rocket)
+void fireworks_rocket_del(fireworks_t *fireworks, rocket_t *rocket)
 {
-    assert(fw && rocket);
+    assert(fireworks && rocket);
 
     // delete the first one?
-    if(fw->rocket==rocket)
+    if(fireworks->rocket==rocket)
     {
-        fw->count--;
-        fw->rocket = fw->rocket->next;
+        fireworks->count--;
+        fireworks->rocket = fireworks->rocket->next;
         free(rocket);
     }
     else
     // loop through to find, delete and relink
-    for(rocket_t *x=fw->rocket; x; x=x->next)
+    for(rocket_t *x=fireworks->rocket; x; x=x->next)
     if(rocket == x->next)
     {
-        fw->count--;
+        fireworks->count--;
         x->next = rocket->next;
         free(rocket);
         break;
@@ -296,10 +308,10 @@ void fireworks_rocket_del(fireworks_t *fw, rocket_t *rocket)
 }
 
 // free memory of the fireworks container
-void fireworks_destroy(fireworks_t **fw)
+void fireworks_destroy(fireworks_t **fireworks)
 {
-    assert(fw && *fw);
-    rocket_t *rocket = (*fw)->rocket;
+    assert(fireworks && *fireworks);
+    rocket_t *rocket = (*fireworks)->rocket;
 
     while(rocket)
     {
@@ -308,59 +320,56 @@ void fireworks_destroy(fireworks_t **fw)
         free(x);
     }
 
-    free(*fw);
-    *fw = NULL;
+    free(*fireworks);
+    *fireworks = NULL;
 }
 
 // add one rocket to the list
-void fireworks_shoot(fireworks_t *fw)
+void fireworks_shoot(fireworks_t *fireworks)
 {
-    assert(fw);
+    assert(fireworks);
     rocket_t *rocket = (rocket_t*)malloc(sizeof(rocket_t));
     if(!rocket)
         exit(1); // no memory
 
-    if(!fw->rocket)
+    if(!fireworks->rocket)
     {
-        fw->rocket = rocket;
-        fw->rocket->next = NULL;
+        // first one
+        fireworks->rocket = rocket;
+        fireworks->rocket->next = NULL;
     }
     else
     {
         // push
-        rocket->next = fw->rocket;
-        fw->rocket = rocket;
+        rocket->next = fireworks->rocket;
+        fireworks->rocket = rocket;
     }
 
-    fw->count++;
-    fireworks_rocket_init(fw, rocket);
+    fireworks->count++;
+    fireworks_rocket_init(fireworks, rocket);
 }
 
 // animate the rockets in fireworks
-void fireworks_run(fireworks_t *fw)
+void fireworks_run(fireworks_t *fireworks)
 {
-    assert(fw);
-
-    // print frame
-    // xy_print_c(fw->x, fw->y,'@');
-    // xy_print_c(fw->x+fw->sx-1, fw->y, '@');
-    // xy_print_c(fw->x, fw->y+fw->sy-1,'@');
-    // xy_print_c(fw->x+fw->sx-1, fw->y+fw->sy-1, '@');
+    assert(fireworks);
 
     // print rockets and increment state if needed
-    for(rocket_t *rocket=fw->rocket; rocket; rocket=rocket->next)
-        fireworks_rocket_inc(fw, rocket);
+    for(rocket_t *rocket=fireworks->rocket; rocket; rocket=rocket->next)
+        fireworks_rocket_inc(rocket);
 
-    rocket_t *rocket = fw->rocket;
+    // recycle rockets after explosion
+    rocket_t *rocket = fireworks->rocket;
     while(rocket)
     {
         rocket_t *next = rocket->next;
-        if(rocket->state>20) // recycle ?
-            fireworks_rocket_del(fw, rocket);
+        if(rocket->state==STATE_RECYCLE)
+            fireworks_rocket_del(fireworks, rocket);
         rocket = next;
     }
 }
 
+// prepare the color pairs
 void init_colors()
 {
     init_pair(1, COLOR_WHITE, COLOR_BLACK);
@@ -374,8 +383,8 @@ void init_colors()
 int main()
 {
     // allocate the rocketry fireworks object
-    fireworks_t *fw = (fireworks_t*)malloc(sizeof(fireworks_t));
-    if(!fw)
+    fireworks_t *fireworks = (fireworks_t*)malloc(sizeof(fireworks_t));
+    if(!fireworks)
         exit(1);
 
     srand(time(0)); // random seed
@@ -393,39 +402,39 @@ int main()
     int sy = getmaxy(stdscr);
     int key = -1, pause = 0;
     
-    fireworks_init(fw, x, y, sx, sy); // initialize the "fireworks" variables
+    fireworks_init(fireworks, x, y, sx, sy); // initialize the "fireworks" variables
 
     do {
         key = getch();
 
-        // shoot ?
+        // shoot
         if(key>='1' && key<='9')
         {
-            while(key-->'0')
-                fireworks_shoot(fw);    // shoot a rocket
+            while(key-->'0' && fireworks->count<200)
+                fireworks_shoot(fireworks);    // shoot a rocket
             key = -1;
             pause = 0;
         }
         else
-        // pause ?
+        // pause
         if(key==' ')
         {
-            if(fw->rocket)
+            if(fireworks->rocket)
                pause = !pause;
             key = -1;
         }
 
         if(!pause)
-            fireworks_run(fw);  // run
+            fireworks_run(fireworks);  // run
 
-        sprintf(status, " Rockets: %d", fw->count);
+        sprintf(status, " Rockets: %d", fireworks->count);
         xy_print_str(x, sy-1, "Press 1-9 to shoot, SPACE to pause/continue, or any other key to exit..");
         xy_print_str(x+sx-strlen(status), sy-1, status);
         wrefresh(stdscr);   // refresh screen
         napms(150);         // make a pause (0.15s)
     } while(key==-1);       // finish if a key is pressed (exception with numbers and SPACE)
 
-    fireworks_destroy(&fw); // free memory
+    fireworks_destroy(&fireworks); // free memory
 
     endwin(); 
     return 0;
