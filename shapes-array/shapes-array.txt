@@ -31,9 +31,9 @@ Example:
 
 void square(_, _)
 {
-	for(_;_;_)
+    for(_;_;_)
     {
-	    for(_;_;_)
+	for(_;_;_)
         {
         }
     }
