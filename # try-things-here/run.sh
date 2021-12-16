@@ -1,0 +1,1 @@
+gcc -Wall -Wextra -Wpedantic -Werror tryhere.c -o out && ./out

@@ -1,10 +1,7 @@
-## Exclude special folders
-Assignments
-Other files
-
 ## Exclude
 *.json
 *.vscode
+build
 out
 
 ###
