@@ -1,0 +1,41 @@
+
+Using the program bounce.c, try to accomplish the following steps.
+You can change anything you want, such as add or change functions, add or
+change variables. It is recommended to start changing the function "game" or
+the initialization of global variables.
+
+- Step 1: "bounce horizontally"
+    Modify the original file bounce.c.
+    Make the ball bounce horizontally in the borders of the window.
+    From right to left, then left to right, and repeat.
+
+- Step 2: "bounce vertically"
+    Modify the original file bounce.c.
+    Make the ball bounce vertically in the borders of the window.
+    From top to bottom, then bottom to top, and repeat.
+
+- Step 3: "bounce diagonally"
+    Modify the original file bounce.c.
+    Combine steps 2 and 3, and make the ball move diagonally and
+    bounce in all the borders of the window.
+
+- Step 4: "bounce and deflate"
+    From step 3 as a starting point, modify the program in a way that the
+    borders of the windows move to the center one step for each bounce.
+    Touch the left, move left one step to the center. Touch the right, move
+    the right one step to the center. The same with top and bottom borders.
+    There is a moment where the window "disappears". There you exit the program.
+    Try this example with a window with size 50x30 more or less, and expand your
+    terminal to make space for the window to fit in.
+
+- Step 5: "bounce and deflate/inflate"
+    From step 4 as a starting point, change the behaviour in a way that instead
+    of exiting the program when the window disappears, in that moment the window
+    should increase the borders one step for each bounce until it reaches the original
+    size. From there the deflation process starts again.
+
+- Ideas:
+    Print a status with the amount of bounces.
+    Change the position variables for a struct.
+    Change the ball for a snake (learn array).
+    Create one obstacle in the window, and bounce if it is touched.
