@@ -28,8 +28,14 @@ the initialization of global variables.
     Try this example with a window with size 50x30 more or less, and expand your
     terminal to make space for the window to fit in.
 
+- Step 5
+    From step 3 as a starting point, add a "status" in the bottom right corner
+    showing the count of bounces.
+
+- Step 6
+    Use of structs. Starting from "bounce-b.c" redo to get the result from step 5.
+    As you see in the file, many global variables have being moved into structs.
+
 - Ideas:
-    Print a status with the amount of bounces.
-    Create a struct for the position variables and screen.
     Change the ball for a snake (learn array).
     Create one obstacle in the window, and bounce if it is touched.

@@ -18,11 +18,11 @@ int screen_y = 0; // screen reference position right
 int screen_sx = 50; // screen size: horizontal axis
 int screen_sy = 10; // screen size: vertical axis
 
-// point variables
-float px = 1; // ball position: horizontal axis
-float py = 1; // ball position: vertical axis
-float px_increment = 0; // movement: horizontal axis
-float py_increment = 1; // movement: vertical axis
+// ball variables
+int px = 1; // ball position: horizontal axis
+int py = 1; // ball position: vertical axis
+int px_increment = 0; // movement: horizontal axis
+int py_increment = 1; // movement: vertical axis
 
 void set_color(const char *color)
 {

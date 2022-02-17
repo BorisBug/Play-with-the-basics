@@ -18,11 +18,11 @@ int screen_y = 0; // screen reference position right
 int screen_sx = 50; // screen size: horizontal axis
 int screen_sy = 10; // screen size: vertical axis
 
-// point variables
-float px = 1; // ball position: horizontal axis
-float py = 1; // ball position: vertical axis
-float px_increment = 1; // movement: horizontal axis
-float py_increment = 0; // movement: vertical axis
+// ball variables
+int px = 1; // ball position: horizontal axis
+int py = 1; // ball position: vertical axis
+int px_increment = 1; // movement: horizontal axis
+int py_increment = 0; // movement: vertical axis
 
 void set_color(const char *color)
 {
@@ -83,18 +83,18 @@ void play()
     px += px_increment; 
     py += py_increment;
 
-    // do not go over the right side
-    if(px>=screen_x+screen_sx)
-        px = screen_x+1;
-    // do not go over the left side
-    if(px<screen_x)
-        px = screen_x+screen_sx-1;
-    // do not go over the bottom side
-    if(py>=screen_y+screen_sy)
-        py = screen_y+1;
     // do not go over the top side
-    if(py<screen_y)
-        py = screen_y+screen_sy-1;
+    if(py<=screen_y)
+        py_increment *= -1;
+    // do not go over the left side
+    if(px<=screen_x)
+        px_increment *= -1;
+    // do not go over the right side
+    if(px>=screen_x+screen_sx-1)
+        px_increment *= -1;
+    // do not go over the bottom side
+    if(py>=screen_y+screen_sy-1)
+        py_increment *= -1;
 
     // show the new position
     xy_print(px, py, "O");

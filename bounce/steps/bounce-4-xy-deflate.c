@@ -16,13 +16,16 @@
 int screen_x = 0; // screen reference position left
 int screen_y = 0; // screen reference position right
 int screen_sx = 50; // screen size: horizontal axis
-int screen_sy = 10; // screen size: vertical axis
+int screen_sy = 25; // screen size: vertical axis
 
-// point variables
-float px = 1; // ball position: horizontal axis
-float py = 1; // ball position: vertical axis
-float px_increment = 1; // movement: horizontal axis
-float py_increment = 0; // movement: vertical axis
+// ball variables
+int px = 1; // ball position: horizontal axis
+int py = 1; // ball position: vertical axis
+int px_increment = 1; // movement: horizontal axis
+int py_increment = 1; // movement: vertical axis
+
+// true while screen is not gone
+int keep_running = 1;
 
 void set_color(const char *color)
 {
@@ -83,18 +86,39 @@ void play()
     px += px_increment; 
     py += py_increment;
 
-    // do not go over the top side
-    if(py<=screen_y)
-        py_increment *= -1;
-    // do not go over the left side
-    if(px<=screen_x)
-        px_increment *= -1;
     // do not go over the right side
     if(px>=screen_x+screen_sx-1)
+    {
+        px--;
+        screen_sx--;
         px_increment *= -1;
+    }
+    // do not go over the left side
+    if(px<=screen_x)
+    {
+        px++;
+        screen_x++;
+        screen_sx--;
+        px_increment *= -1;
+    }
     // do not go over the bottom side
     if(py>=screen_y+screen_sy-1)
+    {
+        py--;
+        screen_sy--;
         py_increment *= -1;
+    }
+    // do not go over the top side
+    if(py<=screen_y)
+    {
+        py++;
+        screen_y++;
+        screen_sy--;
+        py_increment *= -1;
+    }
+
+    if(screen_sx<=0 || screen_sy<=0)
+        keep_running = 0;
 
     // show the new position
     xy_print(px, py, "O");
@@ -102,7 +126,7 @@ void play()
 
 int main()
 {   
-    while(1)
+    while(keep_running)
     {
         play(); 
         print_borders();
