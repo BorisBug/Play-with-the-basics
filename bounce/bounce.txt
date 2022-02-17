@@ -1,7 +1,7 @@
 
 Using the program bounce.c, try to accomplish the following steps.
 You can change anything you want, such as add or change functions, add or
-change variables. It is recommended to start changing the function "game" or
+change variables. It is recommended to start changing the function "play" or
 the initialization of global variables.
 
 - Step 1: "bounce horizontally"
@@ -28,14 +28,8 @@ the initialization of global variables.
     Try this example with a window with size 50x30 more or less, and expand your
     terminal to make space for the window to fit in.
 
-- Step 5: "bounce and deflate/inflate"
-    From step 4 as a starting point, change the behaviour in a way that instead
-    of exiting the program when the window disappears, in that moment the window
-    should increase the borders one step for each bounce until it reaches the original
-    size. From there the deflation process starts again.
-
 - Ideas:
     Print a status with the amount of bounces.
-    Change the position variables for a struct.
+    Create a struct for the position variables and screen.
     Change the ball for a snake (learn array).
     Create one obstacle in the window, and bounce if it is touched.
